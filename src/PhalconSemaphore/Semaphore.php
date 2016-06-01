@@ -62,4 +62,44 @@ class Semaphore extends Component
 
   }
 
+
+  /**
+   * Execute operation by instantiation
+   *
+   * @param string $class
+   * @param string $method
+   * @param int $hours
+   * @param array $args
+   */
+  public function runInstantiate($class, $method, $hours = 24, $args = array())
+  {
+
+    $name = "$class::$method";
+
+    if (class_exists($class)) {
+
+      try {
+
+        // If this semaphore has been run in the past $hours hours, return
+        $sql = 'SELECT * FROM ' . $this->table . ' WHERE name = ? AND timestamp >= DATE_SUB(NOW(), INTERVAL ? hour)';
+        if ($existing = $this->pdo->executeQuery($sql, array($name, $hours))) {
+          return;
+        }
+
+        // Perform operation
+        $obj = new $class();
+        $results = $obj->$method($args);
+
+        // Insert or update timestamp
+        $sql = 'INSERT INTO ' . $this->table . ' (`name`, `timestamp`) VALUES (?, NOW()) ON DUPLICATE KEY UPDATE timestamp = NOW()';
+        $this->pdo->executeQuery($sql, array($name));
+
+      } catch (Exception $e) {
+        // Error
+      }
+
+    }
+
+  }
+
 }

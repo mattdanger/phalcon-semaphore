@@ -47,11 +47,11 @@ $di->set('semaphore', function() use ($config){
 
 ```php
 
-$this->semaphore->run([Class], [method]);
+$this->semaphore->run(string $class, $string method, int $expiration_hours, array $args);
 
 // Example without method parameters
-$this->semaphore->run('MyNamespace\Models\Stat', 'calculate');
+$this->semaphore->run('MyNamespace\Models\Stat', 'calculate', 1);
 
 // Example with method parameters
-$this->semaphore->run('MyNamespace\Models\Stat', 'calculate', $arg1, $arg2, ...);
+$this->semaphore->run('MyNamespace\Models\Stat', 'calculate', 1, array($arg1, $arg2, ...));
 ```
